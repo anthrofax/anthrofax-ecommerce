@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-function CartModel() {
+function CartModal() {
   const cartItems = true;
 
   return (
@@ -98,4 +98,4 @@ function CartModel() {
   );
 }
 
-export default CartModel;
+export default CartModal;
