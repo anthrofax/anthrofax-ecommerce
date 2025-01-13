@@ -1,5 +1,5 @@
 import { OAuthStrategy, createClient } from "@wix/sdk";
-import { products, collections } from "@wix/stores";
+import { collections , products} from "@wix/stores";
 import { cookies } from "next/headers";
 
 export function wixClientServer() {

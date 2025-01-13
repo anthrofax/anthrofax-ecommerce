@@ -1,5 +1,6 @@
 "use client";
 
+// import { MediaItems } from "@wix/stores";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -22,14 +23,14 @@ const images = [
   },
 ];
 
-function ProductImages() {
+function ProductImages({ imageItems }: { imageItems: any }) {
   const [index, setIndex] = useState(0);
 
   return (
     <div className="">
       <div className="h-[500px] relative">
         <Image
-          src={images[index].url}
+          src={imageItems[index]?.image?.url || "/product.png"}
           alt=""
           fill
           sizes="50vw"
@@ -37,14 +38,14 @@ function ProductImages() {
         />
       </div>
       <div className="flex justify-between gap-4 mt-8">
-        {images.map((image, i) => (
+        {imageItems.map((imageObj: any, i: number) => (
           <div
             className="w-1/4 h-32 relative gap-4 mt-8 cursor-pointer"
-            key={image.id}
+            key={imageObj._id}
             onClick={() => setIndex(i)}
           >
             <Image
-              src={image.url}
+              src={imageObj?.image.url || "/product.png"}
               alt=""
               fill
               sizes="30vw"

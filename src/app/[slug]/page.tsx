@@ -1,46 +1,72 @@
 import Add from "@/components/add";
 import CustomizeProducts from "@/components/customize-product";
 import ProductImages from "@/components/product-images";
+import { wixClientServer } from "@/lib/wix-client-server";
+import { notFound } from "next/navigation";
+import x from "@wix/stores";
 
-function SinglePage() {
+async function SinglePage({
+  params,
+}: {
+  params: {
+    slug: string;
+  };
+}) {
+  const wixClient = wixClientServer();
+  const { items } = await wixClient.products
+    .queryProducts()
+    .eq("slug", params.slug)
+    .find();
+
+  const product = items[0];
+
+  if (!product) return notFound();
+
+  console.log(product);
+
   return (
     <div className="px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 relative flex flex-col lg:flex-row gap-16">
       {/* Image */}
       <div className="w-full lg:w-1/2 lg:sticky top-20 h-max">
-        <ProductImages />
+        <ProductImages imageItems={product.media?.items} />
       </div>
 
       {/* Texts */}
       <div className="w-full lg:w-1/2 flex flex-col gap-6">
-        <h1 className="text-4xl font-medium">Product Name</h1>
-        <p className="text-gray-500">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque
-          ducimus obcaecati ullam repudiandae debitis tenetur nam magnam laborum
-          molestiae ex quibusdam expedita dolorum perspiciatis labore dolorem,
-          facere culpa, qui eum!
-        </p>
+        <h1 className="text-4xl font-medium">{""}</h1>
+        <p className="text-gray-500">{product.name}</p>
         <div className="h-[2px] bg-gray-100" />
 
         <div className="flex items-center gap-4">
-          <h3 className="text-xl text-gray-500 line-through">$59</h3>
-          <h2 className="font-medium text-2xl">$49</h2>
+          {product.priceData?.discountedPrice === product.priceData?.price ? (
+            <h2 className="font-medium text-2xl">
+              {product.priceData?.formatted?.price}
+            </h2>
+          ) : (
+            <>
+              <h3 className="text-xl text-gray-500 line-through">
+                {product.priceData?.formatted?.price}
+              </h3>
+              <h2 className="font-medium text-2xl">
+                {product.priceData?.formatted?.discountedPrice}
+              </h2>
+            </>
+          )}
         </div>
         <div className="h-[2px] bg-gray-100" />
         <CustomizeProducts />
         <Add />
         <div className="h-[2px] bg-gray-100" />
-        <div className="text-sm">
-            <h4 className="font-medium mb-4">Title</h4>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati sapiente sunt voluptatibus cum veritatis possimus vitae. Rem, a nobis reiciendis non eius laboriosam, eveniet, sit sunt doloribus odit veniam tenetur.</p>
-        </div>
-        <div className="text-sm">
-            <h4 className="font-medium mb-4">Title</h4>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati sapiente sunt voluptatibus cum veritatis possimus vitae. Rem, a nobis reiciendis non eius laboriosam, eveniet, sit sunt doloribus odit veniam tenetur.</p>
-        </div>
-        <div className="text-sm">
-            <h4 className="font-medium mb-4">Title</h4>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati sapiente sunt voluptatibus cum veritatis possimus vitae. Rem, a nobis reiciendis non eius laboriosam, eveniet, sit sunt doloribus odit veniam tenetur.</p>
-        </div>
+
+        {product.additionalInfoSections &&
+        product.additionalInfoSections.length !== 0
+          ? product.additionalInfoSections.map((info, i) => (
+              <div className="text-sm" key={i}>
+                <h4 className="font-medium mb-4">{info.title}</h4>
+                <p>{info.description}</p>
+              </div>
+            ))
+          : null}
       </div>
     </div>
   );
