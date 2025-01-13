@@ -1,8 +1,19 @@
 import Filter from "@/components/filter";
 import ProductList from "@/components/product-list";
+import { useWixClientContext } from "@/contexts/wix-context";
+import { wixClientServer } from "@/lib/wix-client-server";
 import Image from "next/image";
+import { Suspense } from "react";
 
-function ListPage() {
+async function ListPage({ searchParams }: { searchParams: any }) {
+  const wixClient = wixClientServer();
+
+  const cat = await wixClient.collections.getCollectionBySlug(
+    searchParams.cat || "all-products"
+  );
+
+  console.log(cat);
+
   return (
     <div className="px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 relative">
       {/* Compaign */}
@@ -27,7 +38,14 @@ function ListPage() {
 
       {/* Products */}
       <h1 className="mt-12 text-xl font-semibold">Shoes for you!</h1>
-      <ProductList />
+      <Suspense>
+        <ProductList
+          categoryId={
+            cat.collection?._id || "00000000-000000-000000-000000000001"
+          }
+          searchParams={searchParams}
+        />
+      </Suspense>
     </div>
   );
 }
