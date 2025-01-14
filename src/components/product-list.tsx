@@ -3,25 +3,59 @@ import { Rupiah } from "@/utils/rupiah-formatter";
 import Image from "next/image";
 import Link from "next/link";
 import DOMPurify from "isomorphic-dompurify";
+import { products } from "@wix/stores";
 
 interface PropsType {
   limit?: number;
   categoryId: string;
-  searchParams?: object;
+  searchParams?: any;
 }
 
-async function ProductList({ categoryId, limit = 20 }: PropsType) {
+const PRODUCT_PER_PAGE = 8;
+
+async function ProductList({
+  categoryId,
+  limit = 20,
+  searchParams,
+}: PropsType) {
   const wixClient = wixClientServer();
 
-  const { items } = await wixClient.products
+  const productQuery = wixClient.products
     .queryProducts()
+    .startsWith("name", searchParams?.name || "")
     .eq("collectionIds", categoryId)
-    .limit(limit)
-    .find();
+    .hasSome(
+      "productType",
+      searchParams?.type ? [searchParams.type] : ["physical", "digital"]
+    )
+    .gt("priceData.price", searchParams?.min || 0)
+    .lt("priceData.price", searchParams?.max || 999999)
+    .limit(limit || PRODUCT_PER_PAGE)
+    .skip(
+      searchParams?.page
+        ? parseInt(searchParams.page) * (limit || PRODUCT_PER_PAGE)
+        : 0
+    );
+  // .find();
+
+  let res: products.ProductsQueryResult;
+
+  if (searchParams?.sort) {
+    const [sortType, sortBy] = searchParams.sort.split(" ");
+
+    if (sortType === "asc") {
+      res = await productQuery.ascending(sortBy).find();
+    }
+    if (sortType === "desc") {
+      res = await productQuery.descending(sortBy).find();
+    }
+  } else {
+    res = await productQuery.find();
+  }
 
   return (
     <div className=" mt-12 flex gap-x-8 gap-y-16 justify-between flex-wrap">
-      {items.map((product) => (
+      {res!.items.map((product) => (
         <Link
           key={product._id}
           href={"/" + product.slug}

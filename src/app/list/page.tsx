@@ -7,10 +7,14 @@ import { Suspense } from "react";
 
 async function ListPage({ searchParams }: { searchParams: any }) {
   const wixClient = wixClientServer();
-
-  const cat = await wixClient.collections.getCollectionBySlug(
-    searchParams.cat || "all-products"
-  );
+  let cat;
+  try {
+    cat = await wixClient.collections.getCollectionBySlug(
+      searchParams?.cat || "all-products"
+    );
+  } catch (error) {
+    cat = null;
+  }
 
   return (
     <div className="px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 relative">
@@ -34,16 +38,27 @@ async function ListPage({ searchParams }: { searchParams: any }) {
       {/* Filter */}
       <Filter />
 
-      {/* Products */}
-      <h1 className="mt-12 text-xl font-semibold">Shoes for you!</h1>
-      <Suspense>
-        <ProductList
-          categoryId={
-            cat.collection?._id || "00000000-000000-000000-000000000001"
-          }
-          searchParams={searchParams}
-        />
-      </Suspense>
+      {!cat && (
+        <h1 className="mt-12 text-xl font-semibold text-center">
+          Produk dengan kategori yang anda cari tidak tersedia
+        </h1>
+      )}
+
+      {cat && (
+        <>
+          <h1 className="mt-12 text-xl font-semibold">
+            {cat.collection?.name} for you!
+          </h1>
+          <Suspense>
+            <ProductList
+              categoryId={
+                cat.collection?._id || "00000000-000000-000000-000000000001"
+              }
+              searchParams={searchParams}
+            />
+          </Suspense>
+        </>
+      )}
     </div>
   );
 }

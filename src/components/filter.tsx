@@ -13,10 +13,8 @@ function Filter() {
     const { name, value } = e.target;
 
     const params = new URLSearchParams(searchParams);
-    console.log(params);
     params.set(name, value);
-
-    replace(`${pathname}?${params}`);
+    replace(`${pathname}?${params.toString()}`);
   }
 
   return (
@@ -75,10 +73,10 @@ function Filter() {
           onChange={handleChange}
         >
           <option value="">Sort By</option>
-          <option value="physical">Price (low to high)</option>
-          <option value="digital">Price (high to low)</option>
-          <option value="digital">Newest</option>
-          <option value="digital">Oldest</option>
+          <option value="asc price">Price (low to high)</option>
+          <option value="desc price">Price (high to low)</option>
+          <option value="asc lastUpdated">Newest</option>
+          <option value="desc lastUpdated">Oldest</option>
         </select>
       </div>
     </div>
