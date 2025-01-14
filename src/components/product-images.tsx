@@ -1,5 +1,6 @@
 "use client";
 
+import { products } from "@wix/stores";
 // import { MediaItems } from "@wix/stores";
 import Image from "next/image";
 import { useState } from "react";
@@ -23,8 +24,14 @@ const images = [
   },
 ];
 
-function ProductImages({ imageItems }: { imageItems: any }) {
+function ProductImages({
+  imageItems,
+}: {
+  imageItems: products.MediaItem[] | undefined;
+}) {
   const [index, setIndex] = useState(0);
+
+  if (!imageItems) return null;
 
   return (
     <div className="">

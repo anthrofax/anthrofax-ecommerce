@@ -22,8 +22,6 @@ async function SinglePage({
 
   if (!product) return notFound();
 
-  console.log(product);
-
   return (
     <div className="px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 relative flex flex-col lg:flex-row gap-16">
       {/* Image */}
@@ -54,7 +52,16 @@ async function SinglePage({
           )}
         </div>
         <div className="h-[2px] bg-gray-100" />
-        <CustomizeProducts />
+        {product.productOptions &&
+        product.productOptions.length > 0 &&
+        product.variants &&
+        product.variants.length > 0 ? (
+          <CustomizeProducts
+            productOptions={product.productOptions}
+            variants={product.variants}
+            productId={product._id!}
+          />
+        ) : null}
         <Add />
         <div className="h-[2px] bg-gray-100" />
 
