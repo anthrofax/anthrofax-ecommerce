@@ -3,7 +3,6 @@ import CustomizeProducts from "@/components/customize-product";
 import ProductImages from "@/components/product-images";
 import { wixClientServer } from "@/lib/wix-client-server";
 import { notFound } from "next/navigation";
-import x from "@wix/stores";
 
 async function SinglePage({
   params,
@@ -22,6 +21,8 @@ async function SinglePage({
 
   if (!product) return notFound();
 
+  console.log(product);
+
   return (
     <div className="px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 relative flex flex-col lg:flex-row gap-16">
       {/* Image */}
@@ -31,8 +32,8 @@ async function SinglePage({
 
       {/* Texts */}
       <div className="w-full lg:w-1/2 flex flex-col gap-6">
-        <h1 className="text-4xl font-medium">{""}</h1>
-        <p className="text-gray-500">{product.name}</p>
+        <h1 className="text-4xl font-medium">{product.name}</h1>
+        <p className="text-gray-500">{product.description}</p>
         <div className="h-[2px] bg-gray-100" />
 
         <div className="flex items-center gap-4">
@@ -61,8 +62,13 @@ async function SinglePage({
             variants={product.variants}
             productId={product._id!}
           />
-        ) : null}
-        <Add />
+        ) : (
+          <Add
+            stockQuantity={product.stock?.quantity || 0}
+            productId={product._id!}
+            variantId={"00000000-000000-000000-000000000000"}
+          />
+        )}
         <div className="h-[2px] bg-gray-100" />
 
         {product.additionalInfoSections &&

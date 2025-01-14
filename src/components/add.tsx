@@ -1,21 +1,27 @@
 "use client";
 
+import { useWixClientContext } from "@/contexts/wix-context";
 import { useState } from "react";
 
-function Add() {
-  const [quantity, setQuantity] = useState(1);
+interface PropsType {
+  productId: string;
+  variantId: string;
+  stockQuantity: number;
+}
 
-  //   TEMPORARY
-  const stockNumber = 1;
+function Add({ stockQuantity, productId, variantId }: PropsType) {
+  const [quantity, setQuantity] = useState(1);
 
   const handleQuantity = (type: "i" | "d") => {
     if (type === "d" && quantity > 1) {
       setQuantity((prev) => prev - 1);
     }
-    if (type === "i" && quantity < stockNumber) {
+    if (type === "i" && quantity < stockQuantity) {
       setQuantity((prev) => prev + 1);
     }
   };
+
+  const wixClient = useWixClientContext();
 
   return (
     <div className="flex flex-col gap-4">
@@ -34,7 +40,9 @@ function Add() {
             {quantity}
             <button
               className={`text-xl ${
-                quantity === stockNumber ? "cursor-not-allowed" : "cursor-pointer"
+                quantity === stockQuantity
+                  ? "cursor-not-allowed"
+                  : "cursor-pointer"
               }`}
               onClick={() => handleQuantity("i")}
             >
@@ -42,7 +50,8 @@ function Add() {
             </button>
           </div>
           <div className="text-xs">
-            Only <span className="text-orange-500">{2} items</span> left!
+            Only <span className="text-orange-500">{stockQuantity} items</span>{" "}
+            left!
             <br /> {"Don't"} miss it
           </div>
         </div>
