@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import DOMPurify from "isomorphic-dompurify";
 import { products } from "@wix/stores";
+import Pagination from "./pagination";
 
 interface PropsType {
   limit?: number;
@@ -13,11 +14,7 @@ interface PropsType {
 
 const PRODUCT_PER_PAGE = 8;
 
-async function ProductList({
-  categoryId,
-  limit = 20,
-  searchParams,
-}: PropsType) {
+async function ProductList({ categoryId, limit, searchParams }: PropsType) {
   const wixClient = wixClientServer();
 
   const productQuery = wixClient.products
@@ -53,9 +50,11 @@ async function ProductList({
     res = await productQuery.find();
   }
 
+  if (!res!) return null;
+
   return (
     <div className=" mt-12 flex gap-x-8 gap-y-16 justify-between flex-wrap">
-      {res!.items.map((product) => (
+      {res.items.map((product) => (
         <Link
           key={product._id}
           href={"/" + product.slug}
@@ -104,6 +103,11 @@ async function ProductList({
           </button>
         </Link>
       ))}
+      <Pagination
+        currentPage={res.currentPage || 0}
+        hasNext={res.hasNext()}
+        hasPrev={res.hasPrev()}
+      />
     </div>
   );
 }
